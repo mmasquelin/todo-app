@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List - Examen DUT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+        
+        .add-task {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .add-task form {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .add-task input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .add-task input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .add-task button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .add-task button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .tasks-list {
+            padding: 20px 30px 30px;
+        }
+        
+        .task {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .task:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .task.completed {
+            opacity: 0.6;
+        }
+        
+        .task.completed .task-title {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+        
+        .task-title {
+            flex: 1;
+            font-size: 1.1em;
+            color: #333;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .task-actions a {
+            padding: 8px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-toggle {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-toggle:hover {
+            background: #218838;
+        }
+        
+        .task.completed .btn-toggle {
+            background: #ffc107;
+        }
+        
+        .task.completed .btn-toggle:hover {
+            background: #e0a800;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c82333;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state img {
+            width: 100px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Ma Todo List</h1>
+            <p>Examen - Conteneurisation & Orchestration</p>
+        </div>
+        
+        <div class="add-task">
+            <form action="/add" method="POST">
+                <input type="text" name="title" placeholder="Ajouter une nouvelle tâche..." required>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>
+        
+        <div class="tasks-list">
+            {% if tasks %}
+                {% set total = tasks|length %}
+                {% set completed = tasks|selectattr('2', 'equalto', True)|list|length %}
+                
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value">{{ total }}</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">{{ completed }}</div>
+                        <div class="stat-label">Terminées</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">{{ total - completed }}</div>
+                        <div class="stat-label">En cours</div>
+                    </div>
+                </div>
+                
+                <h2 style="margin: 20px 0 15px; color: #333;">Mes tâches</h2>
+                
+                {% for task in tasks %}
+                <div class="task {% if task[2] %}completed{% endif %}">
+                    <div class="task-title">{{ task[1] }}</div>
+                    <div class="task-actions">
+                        <a href="/toggle/{{ task[0] }}" class="btn-toggle">
+                            {% if task[2] %}Réactiver{% else %}Terminer{% endif %}
+                        </a>
+                        <a href="/delete/{{ task[0] }}" class="btn-delete">Supprimer</a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <h3>🎉 Aucune tâche !</h3>
+                    <p>Ajoutez votre première tâche pour commencer</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
